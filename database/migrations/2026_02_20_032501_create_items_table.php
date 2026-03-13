@@ -12,16 +12,39 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('serial_number')->unique();
-            $table->string('brand')->nullable();
+
             $table->string('category')->nullable();
             $table->text('description')->nullable();
-            $table->enum('condition', ['baik', 'cukup_baik', 'rusak_ringan', 'rusak_berat'])->default('baik');
-            $table->enum('status', ['aktif', 'tidak_aktif', 'dipinjam', 'dalam_perbaikan'])->default('aktif');
+            $table->text('specification')->nullable();
+            $table->unsignedInteger('quantity')->default(1);
+
+            $table->enum('condition', [
+                'baik',
+                'cukup_baik',
+                'rusak_ringan',
+                'rusak_berat'
+            ])->default('baik');
+
+            $table->enum('status', [
+                'aktif',
+                'tidak_aktif',
+                'dipinjam',
+                'dalam_perbaikan'
+            ])->default('aktif');
+
             $table->datetime('purchase_date')->nullable();
             $table->decimal('purchase_price', 15, 2)->nullable();
-            $table->foreignId('room_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('unit_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->foreignId('room_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
         });

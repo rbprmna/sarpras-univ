@@ -27,6 +27,14 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
+            'name' => 'Admin Robi',
+            'email' => 'rop@gmail.com',
+            'password' => Hash::make('password'),
+            'role_id' => 1,
+            'unit_id' => null
+        ]);
+
+        User::create([
             'name' => 'Biro Administrasi Akademik',
             'email' => 'baa@lpkia.ac.id',
             'password' => Hash::make('password'),

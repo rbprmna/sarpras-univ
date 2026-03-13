@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\ItemMovement;
 use App\Models\ProcurementRequest;
+use App\Models\Status;
 use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
@@ -19,13 +20,17 @@ class DashboardController extends Controller
             ->whereYear('request_date', now()->year)
             ->count();
 
-        $pengajuanBulanLalu = ProcurementRequest::whereMonth('request_date', now()->subMonth()->month)
-            ->whereYear('request_date', now()->subMonth()->year)
+        // Fix: simpan subMonth() ke variabel agar tidak dipanggil 2x
+        $bulanLalu = now()->subMonth();
+        $pengajuanBulanLalu = ProcurementRequest::whereMonth('request_date', $bulanLalu->month)
+            ->whereYear('request_date', $bulanLalu->year)
             ->count();
 
-        $menungguPersetujuan = ProcurementRequest::whereHas('status', function ($q) {
-            $q->where('name', 'pending');
-        })->count();
+        // Fix: pakai where status_id langsung, bukan whereHas
+        $pendingStatus = Status::where('name', 'pending')->first();
+        $menungguPersetujuan = $pendingStatus
+            ? ProcurementRequest::where('status_id', $pendingStatus->id)->count()
+            : 0;
 
         $totalNilaiPengadaan = ProcurementRequest::sum('total_amount');
 
@@ -73,7 +78,8 @@ class DashboardController extends Controller
             });
 
         // ── 4. Pengajuan Terbaru ───────────────────────────────────
-        $pengajuanTerbaru = ProcurementRequest::with(['unit', 'status', 'items'])
+        // Fix: hapus 'unit' dari with(), pakai kolom 'department' langsung
+        $pengajuanTerbaru = ProcurementRequest::with(['status', 'items'])
             ->latest()
             ->take(5)
             ->get()
@@ -81,11 +87,13 @@ class DashboardController extends Controller
                 return [
                     'id'             => $p->id,
                     'request_number' => $p->request_number,
-                    'unit'           => optional($p->unit)->name,
+                    'unit'           => $p->department,
                     'total_items'    => $p->items->count(),
                     'total_amount'   => $p->total_amount,
                     'status'         => optional($p->status)->name,
-                    'request_date'   => $p->request_date ? $p->request_date->format('d M Y') : null,
+                    'request_date'   => $p->request_date
+                                           ? $p->request_date->format('d M Y')
+                                           : null,
                 ];
             });
 

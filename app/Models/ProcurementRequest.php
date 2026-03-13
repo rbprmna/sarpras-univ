@@ -11,22 +11,20 @@ class ProcurementRequest extends Model
 
     protected $fillable = [
         'request_number',
-        'unit_id',
         'user_id',
         'status_id',
+        'requester_name',
+        'department',
+        'used_for',
+        'request_type',
         'total_amount',
         'description',
-        'request_date'
+        'request_date',
     ];
 
     protected $casts = [
         'request_date' => 'date',
     ];
-
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class);
-    }
 
     public function user()
     {
@@ -48,4 +46,3 @@ class ProcurementRequest extends Model
         return $this->hasMany(Approval::class);
     }
 }
-

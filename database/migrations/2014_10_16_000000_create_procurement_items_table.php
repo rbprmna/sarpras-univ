@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateProcurementItemsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('procurement_items', function (Blueprint $table) {
@@ -22,19 +17,14 @@ class CreateProcurementItemsTable extends Migration
 
             $table->string('item_name');
             $table->integer('quantity');
-            $table->decimal('price', 15, 2);
-            $table->decimal('subtotal', 15, 2);
+            $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0);
+            $table->text('notes')->nullable();
 
             $table->timestamps();
         });
-
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('procurement_items');

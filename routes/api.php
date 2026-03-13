@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\ItemMovementController;
 use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\StatusController;
-use App\Http\Controllers\Api\NotificationController; // ← tambah ini
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,11 +48,11 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::prefix('notifications')->group(function () {
-        Route::get('/',                  [NotificationController::class, 'index']);        // GET semua notif
-        Route::get('/unread-count',      [NotificationController::class, 'unreadCount']);  // GET jumlah unread (polling)
-        Route::post('/read-all',         [NotificationController::class, 'markAllRead']);  // POST tandai semua dibaca
-        Route::post('/{id}/read',        [NotificationController::class, 'markRead']);     // POST tandai satu dibaca
-        Route::delete('/{id}',           [NotificationController::class, 'destroy']);      // DELETE hapus notif
+        Route::get('/',             [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/read-all',    [NotificationController::class, 'markAllRead']);
+        Route::post('/{id}/read',   [NotificationController::class, 'markRead']);
+        Route::delete('/{id}',      [NotificationController::class, 'destroy']);
     });
 
     /*
@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('items')->group(function () {
         Route::get('/categories',      [ItemController::class,       'categories']);
+        Route::get('/export-pdf',      [ItemController::class,       'exportPdf']);  // ← tambah ini
         Route::post('/import',         [ItemImportController::class, 'import']);
         Route::get('/import/template', [ItemImportController::class, 'template']);
 

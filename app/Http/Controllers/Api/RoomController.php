@@ -44,11 +44,20 @@ class RoomController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $room = Room::with(['items.latestMovement'])
-            ->withCount('items')
-            ->findOrFail($id);
+        $room = Room::with(['items' => function ($q) use ($request) {
+            $q->with('latestMovement');
+
+            if ($request->filled('date_from')) {
+                $q->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $q->whereDate('created_at', '<=', $request->date_to);
+            }
+        }])
+        ->withCount('items')
+        ->findOrFail($id);
 
         return response()->json([
             'success' => true,

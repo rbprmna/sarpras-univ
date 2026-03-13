@@ -14,7 +14,8 @@ class ProcurementItem extends Model
         'item_name',
         'quantity',
         'price',
-        'subtotal'
+        'subtotal',
+        'notes',
     ];
 
     public function procurementRequest()
@@ -22,4 +23,3 @@ class ProcurementItem extends Model
         return $this->belongsTo(ProcurementRequest::class);
     }
 }
-

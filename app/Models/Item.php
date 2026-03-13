@@ -23,6 +23,7 @@ class Item extends Model
         'purchase_price',
         'room_id',
         'created_by',
+        'procurement_item_id', // ← tambahan
     ];
 
     protected $casts = [
@@ -51,6 +52,16 @@ class Item extends Model
     public function latestMovement()
     {
         return $this->hasOne(ItemMovement::class)->latestOfMany('moved_at');
+    }
+
+    /**
+     * Relasi ke item dalam pengajuan (procurement_items).
+     * Lewat sini bisa akses procurementItem->procurementRequest
+     * untuk dapat nama pemohon & departemen.
+     */
+    public function procurementItem()
+    {
+        return $this->belongsTo(ProcurementItem::class);
     }
 
     // ─── Scopes ───────────────────────────────────────────────

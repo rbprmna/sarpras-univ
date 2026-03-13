@@ -10,55 +10,35 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         $rooms = [
-            // ── Ruang Kelas ──────────────────────────────────────────
-            ['code' => 'RKL-101', 'name' => 'Ruang Kelas 101', 'description' => 'Ruang kelas teori lantai 1'],
-            ['code' => 'RKL-102', 'name' => 'Ruang Kelas 102', 'description' => 'Ruang kelas teori lantai 1'],
-            ['code' => 'RKL-103', 'name' => 'Ruang Kelas 103', 'description' => 'Ruang kelas teori lantai 1'],
-            ['code' => 'RKL-104', 'name' => 'Ruang Kelas 104', 'description' => 'Ruang kelas teori lantai 1'],
-            ['code' => 'RKL-201', 'name' => 'Ruang Kelas 201', 'description' => 'Ruang kelas teori lantai 2'],
-            ['code' => 'RKL-202', 'name' => 'Ruang Kelas 202', 'description' => 'Ruang kelas teori lantai 2'],
-            ['code' => 'RKL-203', 'name' => 'Ruang Kelas 203', 'description' => 'Ruang kelas teori lantai 2'],
-            ['code' => 'RKL-204', 'name' => 'Ruang Kelas 204', 'description' => 'Ruang kelas teori lantai 2'],
-            ['code' => 'RKL-301', 'name' => 'Ruang Kelas 301', 'description' => 'Ruang kelas teori lantai 3'],
-            ['code' => 'RKL-302', 'name' => 'Ruang Kelas 302', 'description' => 'Ruang kelas teori lantai 3'],
-            ['code' => 'RKL-303', 'name' => 'Ruang Kelas 303', 'description' => 'Ruang kelas teori lantai 3'],
+            // ── Lantai 1 ─────────────────────────────────────────────
+            ['code' => 'GSG-001', 'name' => 'Gedung Serba Guna',          'description' => 'Gedung serbaguna untuk acara besar kampus'],
+            ['code' => 'R-102',   'name' => 'R.102',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-103',   'name' => 'R.103',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-104',   'name' => 'R.104',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-105',   'name' => 'R.105',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-106',   'name' => 'R.106',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-109',   'name' => 'R.109',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-110',   'name' => 'R.110',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-111',   'name' => 'R.111',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-112',   'name' => 'R.112',                       'description' => 'Ruang kelas teori lantai 1'],
+            ['code' => 'R-113',   'name' => 'R.113',                       'description' => 'Ruang kelas teori lantai 1'],
 
-            // ── Lab Komputer ─────────────────────────────────────────
-            ['code' => 'LAB-K01', 'name' => 'Lab Komputer 1', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K02', 'name' => 'Lab Komputer 2', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K03', 'name' => 'Lab Komputer 3', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K04', 'name' => 'Lab Komputer 4', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K05', 'name' => 'Lab Komputer 5', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K06', 'name' => 'Lab Komputer 6', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K07', 'name' => 'Lab Komputer 7', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K08', 'name' => 'Lab Komputer 8', 'description' => 'Laboratorium komputer untuk praktikum'],
-            ['code' => 'LAB-K09', 'name' => 'Lab Komputer 9', 'description' => 'Laboratorium komputer untuk praktikum'],
+            // ── Lantai 2 ─────────────────────────────────────────────
+            ['code' => 'R-201',   'name' => 'R.201',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-202',   'name' => 'R.202',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-203',   'name' => 'R.203',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-204',   'name' => 'R.204',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-205',   'name' => 'R.205',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-206',   'name' => 'R.206',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-208',   'name' => 'R.208',                       'description' => 'Ruang kelas teori lantai 2'],
+            ['code' => 'R-209',   'name' => 'R.209',                       'description' => 'Ruang kelas teori lantai 2'],
 
-            // ── Lab Jaringan ─────────────────────────────────────────
-            ['code' => 'LAB-J01', 'name' => 'Lab Jaringan 1', 'description' => 'Lab jaringan komputer dan Mikrotik'],
-            ['code' => 'LAB-J02', 'name' => 'Lab Jaringan 2', 'description' => 'Lab jaringan komputer dan Mikrotik'],
-            ['code' => 'LAB-J03', 'name' => 'Lab Jaringan 3', 'description' => 'Lab jaringan komputer dan Mikrotik'],
-
-            // ── Biro Administrasi ────────────────────────────────────
-            ['code' => 'BAS-001', 'name' => 'Ruang BAS',  'description' => 'Biro Administrasi Sumber Daya'],
-            ['code' => 'BAU-001', 'name' => 'Ruang BAU',  'description' => 'Biro Administrasi Umum'],
-            ['code' => 'BAA-001', 'name' => 'Ruang BAA',  'description' => 'Biro Administrasi Akademik'],
-            ['code' => 'BAK-001', 'name' => 'Ruang BAK',  'description' => 'Biro Administrasi Keuangan'],
-            ['code' => 'BAM-001', 'name' => 'Ruang BAM',  'description' => 'Biro Administrasi Mahasiswa'],
-
-            // ── Ruang Pimpinan & Staf ────────────────────────────────
-            ['code' => 'PIM-001', 'name' => 'Ruang Direktur',        'description' => 'Ruang direktur kampus'],
-            ['code' => 'PIM-002', 'name' => 'Ruang Wakil Direktur',  'description' => 'Ruang wakil direktur kampus'],
-            ['code' => 'PIM-003', 'name' => 'Ruang Kepala Program',  'description' => 'Ruang kepala program studi'],
-            ['code' => 'PIM-004', 'name' => 'Ruang Dosen',           'description' => 'Ruang kerja dosen'],
-            ['code' => 'PIM-005', 'name' => 'Ruang Rapat',           'description' => 'Ruang rapat pimpinan dan dosen'],
-
-            // ── Fasilitas Umum ───────────────────────────────────────
-            ['code' => 'FAP-001', 'name' => 'GSG (Gedung Serba Guna)',         'description' => 'Gedung serbaguna untuk acara besar kampus'],
-            ['code' => 'FAP-002', 'name' => 'Ruang Seminar',                   'description' => 'Ruang seminar dan presentasi'],
-            ['code' => 'FAP-003', 'name' => 'Perpustakaan',                    'description' => 'Ruang baca dan koleksi buku'],
-            ['code' => 'FAP-004', 'name' => 'Ruang Career Development Center', 'description' => 'Pusat pengembangan karir mahasiswa'],
-            ['code' => 'FAP-005', 'name' => 'Gudang',                          'description' => 'Gudang penyimpanan barang kampus'],
+            // ── Lantai 3 (Lab) ────────────────────────────────────────
+            ['code' => 'R-301',   'name' => 'Lab. Multimedia 1 (R.301)',   'description' => 'Laboratorium multimedia lantai 3'],
+            ['code' => 'R-302',   'name' => 'Lab. Pemrograman (R.302)',    'description' => 'Laboratorium pemrograman lantai 3'],
+            ['code' => 'R-303',   'name' => 'Lab. Basis Data (R.303)',     'description' => 'Laboratorium basis data lantai 3'],
+            ['code' => 'R-304',   'name' => 'Lab. Aplikasi (R.304)',       'description' => 'Laboratorium aplikasi lantai 3'],
+            ['code' => 'R-305',   'name' => 'Lab. Multimedia 2 (R.305)',   'description' => 'Laboratorium multimedia 2 lantai 3'],
         ];
 
         foreach ($rooms as $room) {
