@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,17 @@ use App\Http\Controllers\Api\NotificationController;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+
+// 🧪 TESTING ONLY - hapus setelah selesai test
+Route::post('/test-notif', function () {
+    \App\Http\Controllers\Api\NotificationController::sendNotification(
+        1,
+        'Test Notifikasi 🔔',
+        'Websocket berhasil bekerja!',
+        'success'
+    );
+    return response()->json(['ok' => true, 'message' => 'Notif terkirim!']);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -48,11 +60,11 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::prefix('notifications')->group(function () {
-        Route::get('/',             [NotificationController::class, 'index']);
-        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
-        Route::post('/read-all',    [NotificationController::class, 'markAllRead']);
-        Route::post('/{id}/read',   [NotificationController::class, 'markRead']);
-        Route::delete('/{id}',      [NotificationController::class, 'destroy']);
+        Route::get('/',              [NotificationController::class, 'index']);
+        Route::get('/unread-count',  [NotificationController::class, 'unreadCount']);
+        Route::put('/mark-all-read', [NotificationController::class, 'markAllRead']);
+        Route::put('/{id}/read',     [NotificationController::class, 'markRead']);
+        Route::delete('/{id}',       [NotificationController::class, 'destroy']);
     });
 
     /*
@@ -76,11 +88,12 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::prefix('rooms')->group(function () {
-        Route::get('/',        [RoomController::class, 'index']);
-        Route::post('/',       [RoomController::class, 'store']);
-        Route::get('/{id}',    [RoomController::class, 'show']);
-        Route::put('/{id}',    [RoomController::class, 'update']);
-        Route::delete('/{id}', [RoomController::class, 'destroy']);
+        Route::get('/',                [RoomController::class, 'index']);
+        Route::post('/',               [RoomController::class, 'store']);
+        Route::get('/{id}',            [RoomController::class, 'show']);
+        Route::put('/{id}',            [RoomController::class, 'update']);
+        Route::delete('/{id}',         [RoomController::class, 'destroy']);
+        Route::get('/{id}/export-pdf', [RoomController::class, 'exportPdf']);
     });
 
     /*
@@ -91,7 +104,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('items')->group(function () {
         Route::get('/categories',      [ItemController::class,       'categories']);
-        Route::get('/export-pdf',      [ItemController::class,       'exportPdf']);  // ← tambah ini
+        Route::get('/archived',        [ItemController::class,       'archived']);
+        Route::get('/export-pdf',      [ItemController::class,       'exportPdf']);
         Route::post('/import',         [ItemImportController::class, 'import']);
         Route::get('/import/template', [ItemImportController::class, 'template']);
 
@@ -102,6 +116,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [ItemController::class, 'destroy']);
 
         Route::post('/{id}/restore',  [ItemController::class,         'restore']);
+        Route::delete('/{id}/force',  [ItemController::class,         'forceDelete']);
         Route::post('/{id}/move',     [ItemController::class,         'move']);
         Route::get('/{id}/movements', [ItemMovementController::class, 'byItem']);
     });
@@ -125,6 +140,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('units')->group(function () {
         Route::get('/', [UnitController::class, 'index']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('users')->group(function () {
+        Route::get('/meta',    [UserController::class, 'meta']);
+        Route::get('/',        [UserController::class, 'index']);
+        Route::post('/',       [UserController::class, 'store']);
+        Route::get('/{id}',    [UserController::class, 'show']);
+        Route::put('/{id}',    [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 
 });

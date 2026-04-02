@@ -47,6 +47,30 @@ class ItemController extends Controller
         ]);
     }
 
+    /**
+     * Daftar barang yang sudah diarsipkan (soft deleted)
+     */
+    public function archived(Request $request)
+    {
+        $query = Item::onlyTrashed()->with(['room', 'creator']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('serial_number', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderBy('deleted_at', 'desc');
+
+        return response()->json([
+            'success' => true,
+            'data'    => $query->paginate($request->get('per_page', 10)),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -234,6 +258,20 @@ class ItemController extends Controller
             'success' => true,
             'message' => 'Barang berhasil dipulihkan.',
             'data'    => $item,
+        ]);
+    }
+
+    /**
+     * Hapus permanen (hanya barang yang sudah diarsipkan)
+     */
+    public function forceDelete($id)
+    {
+        $item = Item::onlyTrashed()->findOrFail($id);
+        $item->forceDelete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Barang berhasil dihapus permanen.',
         ]);
     }
 

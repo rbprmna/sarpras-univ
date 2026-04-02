@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Events\NotificationSent;
 
 class NotificationService
 {
@@ -12,13 +13,18 @@ class NotificationService
      */
     public static function send(int $userId, string $type, string $title, string $message, array $data = []): Notification
     {
-        return Notification::create([
+        $notification = Notification::create([
             'user_id' => $userId,
             'type'    => $type,
             'title'   => $title,
             'message' => $message,
             'data'    => $data,
         ]);
+
+        // 🔔 Broadcast real-time via Pusher
+        broadcast(new NotificationSent($notification, $userId));
+
+        return $notification;
     }
 
     /**

@@ -3,77 +3,93 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Events\NotificationSent;
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user  = $request->user();
-        $limit = $request->get('limit', 20);
-
-        $notifications = Notification::forUser($user->id)
-            ->latest()
-            ->limit($limit)
+        $notifications = Notification::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($n) { return $this->format($n); });
-
-        $unreadCount = Notification::forUser($user->id)->unread()->count();
+            ->map(function ($n) {
+                $n->is_read = !is_null($n->read_at);
+                return $n;
+            });
 
         return response()->json([
-            'success'      => true,
-            'data'         => $notifications,
-            'unread_count' => $unreadCount,
+            'status' => 'success',
+            'data'   => $notifications,
         ]);
     }
 
-    public function unreadCount(Request $request)
+    public function unreadCount()
     {
-        $count = Notification::forUser($request->user()->id)->unread()->count();
+        $count = Notification::where('user_id', Auth::id())
+            ->whereNull('read_at')
+            ->count();
 
         return response()->json([
-            'success'      => true,
-            'unread_count' => $count,
+            'status' => 'success',
+            'count'  => $count,
         ]);
     }
 
-    public function markRead(Request $request, $id)
+    public function markRead($id)
     {
-        $notif = Notification::where('user_id', $request->user()->id)->findOrFail($id);
-        $notif->markAsRead();
+        $notification = Notification::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        return response()->json(['success' => true, 'message' => 'Notifikasi ditandai sudah dibaca.']);
+        $notification->update(['read_at' => now()]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Notifikasi ditandai sudah dibaca',
+        ]);
     }
 
-    public function markAllRead(Request $request)
+    public function markAllRead()
     {
-        Notification::forUser($request->user()->id)
-            ->unread()
+        Notification::where('user_id', Auth::id())
+            ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        return response()->json(['success' => true, 'message' => 'Semua notifikasi sudah ditandai dibaca.']);
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Semua notifikasi sudah dibaca',
+        ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        Notification::where('user_id', $request->user()->id)->findOrFail($id)->delete();
+        $notification = Notification::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        return response()->json(['success' => true, 'message' => 'Notifikasi dihapus.']);
+        $notification->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Notifikasi dihapus',
+        ]);
     }
 
-    private function format(Notification $n)
+    public static function sendNotification($userId, $title, $message, $type = 'info')
     {
-        return [
-            'id'         => $n->id,
-            'type'       => $n->type,
-            'title'      => $n->title,
-            'message'    => $n->message,
-            'data'       => $n->data,
-            'is_read'    => $n->is_read,
-            'read_at'    => $n->read_at ? $n->read_at->toISOString() : null,
-            'created_at' => $n->created_at->toISOString(),
-            'time_ago'   => $n->created_at->diffForHumans(),
-        ];
+        $notification = Notification::create([
+            'user_id' => $userId,
+            'title'   => $title,
+            'message' => $message,
+            'type'    => $type,
+            'read_at' => null,
+        ]);
+
+        broadcast(new NotificationSent($notification, $userId));
+
+        return $notification;
     }
 }

@@ -1,13 +1,16 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+
+    'paths' => [
+        'api/*',
+        'broadcasting/auth',
+        'sanctum/csrf-cookie',
+    ],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:3000',  // React dev server
-    ],
+    'allowed_origins' => ['http://localhost:3000'],
 
     'allowed_origins_patterns' => [],
 
@@ -17,5 +20,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,  // penting untuk Sanctum token
+    'supports_credentials' => true,
+
 ];
