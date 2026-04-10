@@ -102,4 +102,50 @@ class RoomController extends Controller
             'message' => 'Ruangan berhasil dihapus.',
         ]);
     }
+
+    public function exportPdf($id, Request $request)
+    {
+        try {
+            $room = Room::with(['items' => function ($q) use ($request) {
+                $q->with('latestMovement');
+
+                if ($request->filled('date_from')) {
+                    $q->whereDate('created_at', '>=', $request->date_from);
+                }
+                if ($request->filled('date_to')) {
+                    $q->whereDate('created_at', '<=', $request->date_to);
+                }
+            }])->findOrFail($id);
+
+            $items = $room->items;
+
+            $stats = [
+                'total'        => $items->count(),
+                'baik'         => $items->where('condition', 'baik')->count(),
+                'cukup_baik'   => $items->where('condition', 'cukup_baik')->count(),
+                'rusak_ringan' => $items->where('condition', 'rusak_ringan')->count(),
+                'rusak_berat'  => $items->where('condition', 'rusak_berat')->count(),
+            ];
+
+            $pdf = app('dompdf.wrapper')->loadView('pdf.room_inventory', [
+                'room'       => $room,
+                'items'      => $items,
+                'stats'      => $stats,
+                'dateFrom'   => $request->date_from,
+                'dateTo'     => $request->date_to,
+                'exportedAt' => now()->format('d/m/Y H:i'),
+            ]);
+
+            $pdf->setPaper('a4', 'landscape');
+
+            return $pdf->download("inventaris-{$room->code}.pdf");
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+            ], 500);
+        }
+    }
 }

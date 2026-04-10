@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ActivityLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,11 +76,13 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::prefix('procurements')->group(function () {
-        Route::get('/',            [ProcurementRequestController::class, 'index']);
-        Route::post('/',           [ProcurementRequestController::class, 'store']);
-        Route::get('/{id}',        [ProcurementRequestController::class, 'show']);
-        Route::put('/{id}/status', [ProcurementRequestController::class, 'updateStatus']);
-        Route::delete('/{id}',     [ProcurementRequestController::class, 'destroy']);
+        Route::get('/',              [ProcurementRequestController::class, 'index']);
+        Route::post('/',             [ProcurementRequestController::class, 'store']);
+        Route::post('/bulk-status',  [ProcurementRequestController::class, 'bulkStatus']);   // ← BARU
+        Route::post('/bulk-delete',  [ProcurementRequestController::class, 'bulkDestroy']);  // ← BARU
+        Route::get('/{id}',          [ProcurementRequestController::class, 'show']);
+        Route::put('/{id}/status',   [ProcurementRequestController::class, 'updateStatus']);
+        Route::delete('/{id}',       [ProcurementRequestController::class, 'destroy']);
     });
 
     /*
@@ -103,22 +107,30 @@ Route::middleware('auth:sanctum')->group(function () {
     */
 
     Route::prefix('items')->group(function () {
-        Route::get('/categories',      [ItemController::class,       'categories']);
-        Route::get('/archived',        [ItemController::class,       'archived']);
-        Route::get('/export-pdf',      [ItemController::class,       'exportPdf']);
-        Route::post('/import',         [ItemImportController::class, 'import']);
-        Route::get('/import/template', [ItemImportController::class, 'template']);
 
+        // ✅ Route spesifik harus di atas wildcard /{id}
+        Route::get('/categories',        [ItemController::class,       'categories']);
+        Route::get('/archived',          [ItemController::class,       'archived']);
+        Route::get('/export-pdf',        [ItemController::class,       'exportPdf']);
+        Route::post('/import',           [ItemImportController::class, 'import']);
+        Route::get('/import/template',   [ItemImportController::class, 'template']);
+        Route::post('/bulk-archive',     [ItemController::class,       'bulkArchive']);     // ← BARU
+        Route::post('/bulk-export-pdf',  [ItemController::class,       'bulkExportPdf']);  // ← BARU
+        Route::post('/bulk-restore',      [ItemController::class, 'bulkRestore']);
+        Route::post('/bulk-force-delete', [ItemController::class, 'bulkForceDelete']);
+
+        // CRUD utama
         Route::get('/',        [ItemController::class, 'index']);
         Route::post('/',       [ItemController::class, 'store']);
         Route::get('/{id}',    [ItemController::class, 'show']);
         Route::put('/{id}',    [ItemController::class, 'update']);
         Route::delete('/{id}', [ItemController::class, 'destroy']);
 
-        Route::post('/{id}/restore',  [ItemController::class,         'restore']);
-        Route::delete('/{id}/force',  [ItemController::class,         'forceDelete']);
-        Route::post('/{id}/move',     [ItemController::class,         'move']);
-        Route::get('/{id}/movements', [ItemMovementController::class, 'byItem']);
+        // Route dengan wildcard /{id} — harus paling bawah
+        Route::post('/{id}/restore',     [ItemController::class,         'restore']);
+        Route::delete('/{id}/force',     [ItemController::class,         'forceDelete']);
+        Route::post('/{id}/move',        [ItemController::class,         'move']);
+        Route::get('/{id}/movements',    [ItemMovementController::class, 'byItem']);
     });
 
     /*
@@ -155,6 +167,29 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}',    [UserController::class, 'show']);
         Route::put('/{id}',    [UserController::class, 'update']);
         Route::delete('/{id}', [UserController::class, 'destroy']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📊 Laporan Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('reports')->group(function () {
+        Route::get('/procurement',          [ReportController::class, 'procurement']);
+        Route::get('/procurement/per-unit', [ReportController::class, 'procurementPerUnit']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📋 Log Aktivitas Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('activity-logs')->group(function () {
+        Route::get('/stats',         [ActivityLogController::class, 'stats']);
+        Route::get('/',              [ActivityLogController::class, 'index']);
+        Route::get('/{activityLog}', [ActivityLogController::class, 'show']);
     });
 
 });

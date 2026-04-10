@@ -9,7 +9,8 @@ class UnitSeeder extends Seeder
 {
     public function run(): void
     {
-        Unit::create(['name' => 'Biro Akademik']);
-        Unit::create(['name' => 'Biro Keuangan']);
+        Unit::create(['name' => 'Biro Administrasi Akademik']);
+        Unit::create(['name' => 'Biro Administrasi Umum']);
+        Unit::create(['name' => 'Biro Administrasi Sumber Daya']);
     }
 }

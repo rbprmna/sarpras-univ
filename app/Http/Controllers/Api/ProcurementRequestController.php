@@ -222,4 +222,96 @@ class ProcurementRequestController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+        // In ProcurementRequestController.php
+
+    public function bulkStatus(Request $request)
+    {
+        $request->validate([
+            'ids'    => 'required|array|min:1',
+            'ids.*'  => 'exists:procurement_requests,id',
+            'status' => 'required|string|in:pending,disetujui,ditolak',
+        ]);
+
+        $status = Status::where('name', $request->status)->firstOrFail();
+
+        DB::beginTransaction();
+        try {
+            $procurements = ProcurementRequest::with(['user', 'items'])
+                ->whereIn('id', $request->ids)
+                ->whereHas('status', fn($q) => $q->where('name', 'pending'))
+                ->get();
+
+            foreach ($procurements as $procurement) {
+                $procurement->update(['status_id' => $status->id]);
+
+                if ($request->status === 'disetujui') {
+                    $this->createItemsFromProcurement($procurement, $request->user());
+                }
+
+                // Notify each submitter
+                $adminName   = optional($request->user())->name ?? 'Admin';
+                $statusLabel = $request->status === 'disetujui' ? 'disetujui' : 'ditolak';
+
+                if ($procurement->user_id) {
+                    NotificationService::send(
+                        $procurement->user_id,
+                        'procurement_status',
+                        'Status Pengajuan Diperbarui',
+                        'Pengajuan #' . $procurement->request_number . ' Anda telah ' . $statusLabel . ' oleh ' . $adminName . '.',
+                        [
+                            'procurement_id' => $procurement->id,
+                            'request_number' => $procurement->request_number,
+                            'new_status'     => $request->status,
+                            'admin_name'     => $adminName,
+                        ]
+                    );
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($procurements) . ' pengajuan berhasil diperbarui.',
+                'updated' => $procurements->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'exists:procurement_requests,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $procurements = ProcurementRequest::whereIn('id', $request->ids)
+                ->whereHas('status', fn($q) => $q->where('name', 'pending'))
+                ->get();
+
+            foreach ($procurements as $procurement) {
+                $procurement->items()->delete();
+                $procurement->delete();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $procurements->count() . ' pengajuan berhasil dihapus.',
+                'deleted' => $procurements->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

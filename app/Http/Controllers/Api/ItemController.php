@@ -310,4 +310,73 @@ class ItemController extends Controller
 
         return $pdf->download('inventaris-barang.pdf');
     }
+
+    /**
+     * Arsipkan banyak barang sekaligus (bulk archive)
+     */
+    public function bulkArchive(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:items,id',
+        ]);
+
+        $count = Item::whereIn('id', $request->ids)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} barang berhasil diarsipkan.",
+        ]);
+    }
+
+    /**
+     * Export PDF untuk barang yang dipilih (bulk export PDF)
+     */
+    public function bulkExportPdf(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:items,id',
+        ]);
+
+        $items = Item::with(['room'])
+                     ->whereIn('id', $request->ids)
+                     ->orderBy('created_at', 'desc')
+                     ->get();
+
+        $pdf = Pdf::loadView('pdf.items', compact('items'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->download('inventaris-pilihan-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    public function bulkRestore(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:items,id',
+        ]);
+
+        $count = Item::onlyTrashed()->whereIn('id', $request->ids)->restore();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} barang berhasil dipulihkan.",
+        ]);
+    }
+
+    public function bulkForceDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:items,id',
+        ]);
+
+        $count = Item::onlyTrashed()->whereIn('id', $request->ids)->forceDelete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} barang berhasil dihapus permanen.",
+        ]);
+    }
 }
